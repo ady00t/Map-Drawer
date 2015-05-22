@@ -43,24 +43,13 @@ public class ExplorerPCClient
 		float yp = dis.readFloat();
 		System.out.printf("obstacle x= " + x + " " +"obstacle y= " + y);
 		System.out.printf("robot pose xp= " + xp + " " +"robot pose yp= " + yp);
-	//float h = dis.readFloat();
-		//float range = dis.readFloat();
-		//float angle = dis.readFloat();
+	
 		mc.addPoseRobot(xp, yp);
-		mc.addPosition(x, y);
-		//System.out.printf(
-			//"Position = (%4.2f, %4.2f), heading = %6.2f degrees\n",
-			//x, y, h );
-		//System.out.printf(
-			//"Object found: Range = %6.2f cm. at angle = %6.2f\n",
-			//range, angle );
+		mc.addPosObstacle(x, y);
+		
 		System.out.println();
-		
-		
-
 	    } catch (IOException e)
 	    {
-		//System.out.println("ERROR - " + e.getMessage() );
 		e.printStackTrace();
 		System.exit(0);
 	    }

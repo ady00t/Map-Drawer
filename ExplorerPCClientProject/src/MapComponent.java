@@ -36,7 +36,7 @@ public class MapComponent extends JComponent
        
     }
     
-    public void addPosition(float x, float y)
+    public void addPosObstacle(float x, float y)
     {
 	points.add(new Point(Math.round(x), Math.round(y)));
 	repaint();

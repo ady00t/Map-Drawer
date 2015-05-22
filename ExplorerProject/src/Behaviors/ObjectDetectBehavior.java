@@ -4,9 +4,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import lejos.geom.Point;
-import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
+import lejos.nxt.TouchSensor;
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.comm.NXTConnection;
 import lejos.robotics.RangeReading;
@@ -30,12 +30,14 @@ public class ObjectDetectBehavior implements Behavior, FeatureListener
     private OdometryPoseProvider pose;
     private RangeFeatureDetector rfd;
     private Feature detectedFeature = null;
+    private TouchSensor bumper ;
     
     private DataOutputStream out;
 
     public ObjectDetectBehavior(DifferentialPilot pilot, NXTConnection con)
     {
 	this.pilot = pilot;
+	bumper = new TouchSensor(SensorPort.S2);
 	out = con.openDataOutputStream();
 	pose = new OdometryPoseProvider(pilot);
 	us = new UltrasonicSensor(SensorPort.S1);
@@ -47,7 +49,7 @@ public class ObjectDetectBehavior implements Behavior, FeatureListener
     @Override
     public boolean takeControl()
     {
-	return featureDetected;
+	return featureDetected || bumper.isPressed() ;
     }
 
     @Override
@@ -61,13 +63,12 @@ public class ObjectDetectBehavior implements Behavior, FeatureListener
 		RangeReading range = detectedFeature.getRangeReading();
 		boolean checkRange = range.invalidReading();
 
-	    while (!checkRange && us.getDistance() <26)
+	    while (!checkRange && us.getDistance() <26 || bumper.isPressed() )
 	    {
 	    	range = detectedFeature.getRangeReading();
 		try
 		{
-		
-			
+				
 			Pose position = pose.getPose();
 			  
 		  
@@ -78,8 +79,7 @@ public class ObjectDetectBehavior implements Behavior, FeatureListener
 		    out.writeFloat(position.getY());
 		    pilot.rotate(1);
 		    us.ping();
-		    
-		    
+		    	    
 		    try
 		    {
 			Thread.sleep(50);
@@ -88,12 +88,6 @@ public class ObjectDetectBehavior implements Behavior, FeatureListener
 		    
 		    out.flush();
 		    
-		   // Pose position = pose.getPose();
-		    
-		   // pilot.rotate(-10);
-		    
-		    
-		  
 		} catch (IOException e)
 		{
 		    Sound.beepSequence();
